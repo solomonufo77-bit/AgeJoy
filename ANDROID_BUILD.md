@@ -1,0 +1,1 @@
+AgeJoy Android Play Store configuration\n\nCompile SDK: 36\nTarget SDK: 36\n\nRemoved unnecessary permissions: SYSTEM_ALERT_WINDOW, storage permissions, Bluetooth, NFC, Wi-Fi permissions, and RECEIVE_BOOT_COMPLETED.\n

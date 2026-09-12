@@ -1,0 +1,31 @@
+# AgeJoy test checklist
+
+## 1. Age calculation
+- 2000-01-01 as birth date and 2026-09-01 as calculation date => 26 years, 8 months, 0 days.
+- Birth date after calculation date => validation error and no countdown.
+- Leap-day birth date (2000-02-29) should calculate without invalid dates in non-leap years.
+
+## 2. Birthday reminders
+- Add a birthday with Month/Day/Year selectors.
+- Saved birthday survives refresh.
+- Saved birthdays are sorted by next occurrence without mutating React state.
+- Delete removes the saved birthday.
+- With notification permission granted on Android, enabling notifications schedules birthday reminders for the next five years.
+
+## 3. Wishes, prayers, motivation and favorites
+- Rotate each content category.
+- Copy and Share work or gracefully show a fallback.
+- Favorite saves content locally and Remove Favorite deletes it.
+- Favorites survive refresh.
+
+## 4. Birthday card
+- Preview updates from recipient name and message.
+- Download produces a PNG image.
+
+## 5. Theme and privacy
+- Dark mode persists after refresh.
+- Privacy Policy opens from the footer.
+
+## 6. Android build
+- GitHub Actions installs dependencies, builds Vite, creates Capacitor Android, syncs plugins, targets API 36, builds debug APK and release AAB.
+- Production AAB still requires release signing / Google Play App Signing before Play Store upload.
