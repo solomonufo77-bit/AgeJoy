@@ -1,14 +1,55 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Filesystem, Directory } from '@capacitor/filesystem';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { Bell, BellRing, Cake, CalendarDays, Check, Moon, Quote, RotateCcw, Share2, Sparkles, Sun, Target, Cross, Gem, Star, Download, Plus, Trash2, Heart } from 'lucide-react';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import {
+  Bell,
+  BellRing,
+  Cake,
+  CalendarDays,
+  Check,
+  Moon,
+  Quote,
+  RotateCcw,
+  Share2,
+  Sparkles,
+  Sun,
+  Target,
+  Cross,
+  Gem,
+  Star,
+  Download,
+  Plus,
+  Trash2,
+  Heart
+} from 'lucide-react';
 
 type Age = { years: number; months: number; days: number };
 type SavedBirthday = { id: string; name: string; date: string };
 type Favorite = { id: string; category: string; text: string };
-type ContentKey = 'birthday' | 'month' | 'year' | 'morning' | 'evening' | 'success' | 'motivation';
+type ContentKey =
+  | 'birthday'
+  | 'month'
+  | 'year'
+  | 'morning'
+  | 'evening'
+  | 'success'
+  | 'motivation';
 
-const quotes = ['Small steps every day become remarkable progress.','Your future is built by what you do today.','Keep going. You are closer than you think.','Discipline turns dreams into plans and plans into results.','You do not need to be perfect; you need to keep moving.','Believe in the progress you cannot see yet.','Your consistency today creates your confidence tomorrow.','Protect your peace and keep your purpose in sight.','Every new day is another chance to begin well.','Let your actions speak louder than your doubts.','Great things grow from small decisions made consistently.','Be patient with yourself while you build the life you want.'];
+const quotes = [
+  'Small steps every day become remarkable progress.',
+  'Your future is built by what you do today.',
+  'Keep going. You are closer than you think.',
+  'Discipline turns dreams into plans and plans into results.',
+  'You do not need to be perfect; you need to keep moving.',
+  'Believe in the progress you cannot see yet.',
+  'Your consistency today creates your confidence tomorrow.',
+  'Protect your peace and keep your purpose in sight.',
+  'Every new day is another chance to begin well.',
+  'Let your actions speak louder than your doubts.',
+  'Great things grow from small decisions made consistently.',
+  'Be patient with yourself while you build the life you want.'
+];
 
 const prayers = {
   morning: [
@@ -77,22 +118,24 @@ const wishes = {
 };
 
 const zodiacFacts: Record<string, [string, string, string]> = {
-  Aquarius: ['January 20 – February 18','Amethyst','Violet'],
-  Pisces: ['February 19 – March 20','Aquamarine','Sea Green'],
-  Aries: ['March 21 – April 19','Diamond','Red'],
-  Taurus: ['April 20 – May 20','Emerald','Green'],
-  Gemini: ['May 21 – June 20','Pearl','Yellow'],
-  Cancer: ['June 21 – July 22','Ruby','Silver'],
-  Leo: ['July 23 – August 22','Peridot','Gold'],
-  Virgo: ['August 23 – September 22','Sapphire','Navy Blue'],
-  Libra: ['September 23 – October 22','Opal','Pink'],
-  Scorpio: ['October 23 – November 21','Topaz','Deep Red'],
-  Sagittarius: ['November 22 – December 21','Turquoise','Purple'],
-  Capricorn: ['December 22 – January 19','Garnet','Charcoal']
+  Aquarius: ['January 20 – February 18', 'Amethyst', 'Violet'],
+  Pisces: ['February 19 – March 20', 'Aquamarine', 'Sea Green'],
+  Aries: ['March 21 – April 19', 'Diamond', 'Red'],
+  Taurus: ['April 20 – May 20', 'Emerald', 'Green'],
+  Gemini: ['May 21 – June 20', 'Pearl', 'Yellow'],
+  Cancer: ['June 21 – July 22', 'Ruby', 'Silver'],
+  Leo: ['July 23 – August 22', 'Peridot', 'Gold'],
+  Virgo: ['August 23 – September 22', 'Sapphire', 'Navy Blue'],
+  Libra: ['September 23 – October 22', 'Opal', 'Pink'],
+  Scorpio: ['October 23 – November 21', 'Topaz', 'Deep Red'],
+  Sagittarius: ['November 22 – December 21', 'Turquoise', 'Purple'],
+  Capricorn: ['December 22 – January 19', 'Garnet', 'Charcoal']
 };
 
 function dateValue(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+    d.getDate()
+  ).padStart(2, '0')}`;
 }
 
 function parseDate(value: string) {
@@ -112,7 +155,12 @@ function calculateAge(b: Date, t: Date): Age {
   if (t < b) return { years: 0, months: 0, days: 0 };
 
   let years = t.getFullYear() - b.getFullYear();
-  const birthdayThisYear = annualBirthday(t.getFullYear(), b.getMonth(), b.getDate());
+
+  const birthdayThisYear = annualBirthday(
+    t.getFullYear(),
+    b.getMonth(),
+    b.getDate()
+  );
 
   if (t < birthdayThisYear) years--;
 
@@ -145,14 +193,22 @@ function calculateAge(b: Date, t: Date): Age {
     (t.getTime() - monthAnchor.getTime()) / 86400000
   );
 
-  return { years, months, days: Math.max(0, days) };
+  return {
+    years,
+    months,
+    days: Math.max(0, days)
+  };
 }
 
 function nextBirthday(b: Date, n: Date) {
   let x = annualBirthday(n.getFullYear(), b.getMonth(), b.getDate());
 
   if (x < n) {
-    x = annualBirthday(n.getFullYear() + 1, b.getMonth(), b.getDate());
+    x = annualBirthday(
+      n.getFullYear() + 1,
+      b.getMonth(),
+      b.getDate()
+    );
   }
 
   return x;
@@ -180,6 +236,7 @@ function daysUntil(date: string) {
   const [, month, day] = date.split('-').map(Number);
 
   const now = new Date();
+
   const start = new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -298,9 +355,9 @@ export default function App() {
 
   useEffect(() => {
     LocalNotifications.checkPermissions()
-      .then(result =>
-        setNotify(result.display === 'granted')
-      )
+      .then(result => {
+        setNotify(result.display === 'granted');
+      })
       .catch(() => {
         if (typeof Notification !== 'undefined') {
           setNotify(Notification.permission === 'granted');
@@ -363,15 +420,15 @@ export default function App() {
     tab === 'motivation'
       ? quotes[quoteIndex]
       : tab === 'prayers'
-        ? prayers[prayerType][prayerIndex]
-        : wishes[wishType][wishIndex];
+      ? prayers[prayerType][prayerIndex]
+      : wishes[wishType][wishIndex];
 
   const activeCategory: ContentKey =
     tab === 'motivation'
       ? 'motivation'
       : tab === 'prayers'
-        ? prayerType
-        : wishType;
+      ? prayerType
+      : wishType;
 
   const isFavorite = favorites.some(
     f => f.text === activeText
@@ -380,6 +437,7 @@ export default function App() {
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(activeText);
+
       setCopied(true);
 
       setTimeout(
@@ -395,16 +453,24 @@ export default function App() {
 
   const share = async () => {
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'AgeJoy',
-          text: activeText
-        });
-      } else {
-        await copy();
-      }
+      await Share.share({
+        title: 'AgeJoy',
+        text: activeText,
+        dialogTitle: 'Share from AgeJoy'
+      });
     } catch {
-      /* user cancelled */
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: 'AgeJoy',
+            text: activeText
+          });
+        } else {
+          await copy();
+        }
+      } catch {
+        // User cancelled sharing.
+      }
     }
   };
 
@@ -466,7 +532,9 @@ export default function App() {
     }
 
     const notifications = birthdays.flatMap(x => {
-      const [, m, d] = x.date.split('-').map(Number);
+      const [, m, d] = x.date
+        .split('-')
+        .map(Number);
 
       return [0, 1, 2, 3, 4]
         .map(offset => {
@@ -523,9 +591,11 @@ export default function App() {
 
       if (!granted) {
         setNotify(false);
+
         setNotice(
           'Notifications were not allowed. You can enable them later in Android Settings.'
         );
+
         return;
       }
 
@@ -541,9 +611,7 @@ export default function App() {
         const permission =
           await Notification.requestPermission();
 
-        setNotify(
-          permission === 'granted'
-        );
+        setNotify(permission === 'granted');
 
         if (permission === 'granted') {
           new Notification(
@@ -598,9 +666,7 @@ export default function App() {
     );
   };
 
-  const deleteBirthday = async (
-    id: string
-  ) => {
+  const deleteBirthday = async (id: string) => {
     const nextSaved = saved.filter(
       x => x.id !== id
     );
@@ -616,1242 +682,7 @@ export default function App() {
           (_, i) =>
             now.getFullYear() - 5 + i
         ).map(year =>
-          notificationId(
-            `${id}-${year}`
-          )
+          notificationId(`${id}-${year}`)
         );
 
-        await LocalNotifications.cancel({
-          notifications: ids.map(
-            notificationIdValue => ({
-              id: notificationIdValue
-            })
-          )
-        });
-      } catch {
-        /* notification cleanup is best effort */
-      }
-    }
-    
-  const downloadCard = () => {
-  const canvas = document.createElement('canvas');
-
-  canvas.width = 1080;
-  canvas.height = 1080;
-
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) return;
-
-  const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
-
-  gradient.addColorStop(0, '#087f5b');
-  gradient.addColorStop(1, '#14b8a6');
-
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, 1080, 1080);
-
-  ctx.globalAlpha = 0.25;
-  ctx.fillStyle = '#6ee7b7';
-
-  ctx.beginPath();
-  ctx.arc(900, 170, 210, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.globalAlpha = 1;
-
-  ctx.fillStyle = '#d1fae5';
-  ctx.font = '700 38px Arial';
-
-  ctx.fillText(
-    'AGEJOY CELEBRATION',
-    90,
-    180
-  );
-
-  ctx.fillStyle = '#fff';
-  ctx.font = '700 82px Arial';
-
-  ctx.fillText(
-    'Happy Birthday',
-    90,
-    390
-  );
-
-  ctx.fillStyle = '#d1fae5';
-  ctx.font = '700 64px Arial';
-
-  ctx.fillText(
-    cardName.slice(0, 24),
-    90,
-    510
-  );
-
-  ctx.fillStyle = '#fff';
-  ctx.font = '36px Arial';
-
-  wrapCanvasText(
-    ctx,
-    cardMessage,
-    90,
-    610,
-    880,
-    52
-  );
-
-  ctx.fillStyle = '#d1fae5';
-  ctx.font = '700 32px Arial';
-
-  ctx.fillText(
-    'Made with AgeJoy',
-    90,
-    990
-  );
-
-  canvas.toBlob(async (blob) => {
-    if (!blob) {
-      setNotice('Unable to create birthday card.');
-      return;
-    }
-
-    try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new Error('Unable to read card'));
-          }
-        };
-
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(blob);
-      });
-
-      const base64 = dataUrl.split(',')[1];
-
-      const fileName = `AgeJoy-Birthday-Card-${Date.now()}.png`;
-
-      await Filesystem.writeFile({
-        path: fileName,
-        data: base64,
-        directory: Directory.Documents,
-        recursive: true
-      });
-
-      setNotice('Birthday card saved to your Documents folder.');
-    } catch (error) {
-      console.error('Birthday card save error:', error);
-      setNotice('Could not save birthday card.');
-    }
-  }, 'image/png');
-};
-  const sortedBirthdays =
-    [...saved].sort(
-      (a, b) =>
-        daysUntil(a.date) -
-        daysUntil(b.date)
-    );
-
-  return (
-    <div
-      className={
-        dark
-          ? 'min-h-screen bg-slate-950 text-white'
-          : 'min-h-screen bg-[#f6f8f5] text-slate-900'
-      }
-    >
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-emerald-600 p-2.5 text-white">
-              <Sparkles size={20}/>
-            </div>
-
-            <div>
-              <h1 className="font-black">
-                AgeJoy
-              </h1>
-
-              <p className="text-xs text-slate-500">
-                Celebrate every day
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              aria-label="Enable notifications"
-              onClick={requestNotifications}
-              className="rounded-xl border p-2.5 dark:border-slate-700"
-            >
-              {notify
-                ? <BellRing size={18}/>
-                : <Bell size={18}/>
-              }
-            </button>
-
-            <button
-              aria-label="Toggle dark mode"
-              onClick={() => setDark(!dark)}
-              className="rounded-xl border p-2.5 dark:border-slate-700"
-            >
-              {dark
-                ? <Sun size={18}/>
-                : <Moon size={18}/>
-              }
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-5 py-7">
-        <section className="mb-6 rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-500 p-7 text-white shadow-xl">
-          <p className="text-sm font-bold tracking-[.18em] text-emerald-100">
-            MAKE EVERY MILESTONE COUNT
-          </p>
-
-          <h2 className="mt-2 text-3xl font-black sm:text-5xl">
-            Know your age. Celebrate your journey.
-          </h2>
-
-          <p className="mt-3 max-w-2xl text-emerald-50">
-            Age calculator, life milestones, birthday reminders, zodiac facts, prayers, motivation, favorites and celebration cards.
-          </p>
-        </section>
-
-        <nav className="mb-6 grid grid-cols-5 gap-1 rounded-2xl border bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
-          {[
-            [CalendarDays,'age'],
-            [Cake,'wishes'],
-            [Cross,'prayers'],
-            [Quote,'motivation'],
-            [Star,'cards']
-          ].map(([Icon,id]:any) =>
-            <button
-              key={id}
-              onClick={() => setTab(id)}
-              className={
-                'rounded-xl p-3 ' +
-                (tab === id
-                  ? 'bg-emerald-600 text-white'
-                  : 'text-slate-500')
-              }
-            >
-              <Icon
-                size={19}
-                className="mx-auto"
-              />
-
-              <span className="mt-1 block text-[10px] font-bold capitalize">
-                {id}
-              </span>
-            </button>
-          )}
-        </nav>
-
-        {notice && (
-          <div
-            role="status"
-            className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200"
-          >
-            {notice}
-
-            <button
-              className="ml-3 underline"
-              onClick={() => setNotice('')}
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
-        {tab === 'age' && (
-          <>
-            <div className="grid gap-5 lg:grid-cols-2">
-              <Card>
-                <h3 className="font-black">
-                  Your dates
-                </h3>
-
-                <p className="mb-4 text-sm text-slate-500">
-                  Calculate your exact age and birthday countdown.
-                </p>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Label title="Date of birth">
-                    <input
-                      type="date"
-                      value={birthDate}
-                      max={today}
-                      onChange={e =>
-                        setBirthDate(e.target.value)
-                      }
-                      className="input"
-                    />
-                  </Label>
-
-                  <Label title="Calculate as of">
-                    <input
-                      type="date"
-                      value={today}
-                      onChange={e =>
-                        setToday(e.target.value)
-                      }
-                      className="input"
-                    />
-                  </Label>
-                </div>
-
-                {invalidBirth && (
-                  <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-300">
-                    Date of birth must be a valid date and cannot be after the calculation date.
-                  </p>
-                )}
-
-                <button
-                  onClick={() => {
-                    setBirthDate('2000-01-01');
-                    setToday(dateValue(new Date()));
-                    setNotice('Age calculator reset.');
-                  }}
-                  className="mt-5 flex gap-2 font-bold text-emerald-700"
-                >
-                  <RotateCcw size={17}/>
-                  Reset
-                </button>
-              </Card>
-
-              <section className="rounded-3xl bg-slate-900 p-6 text-white">
-                <p className="font-bold text-emerald-300">
-                  YOUR EXACT AGE
-                </p>
-
-                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                  {[
-                    [age.years,'Years'],
-                    [age.months,'Months'],
-                    [age.days,'Days']
-                  ].map(([n,l]) =>
-                    <div
-                      key={String(l)}
-                      className="rounded-2xl bg-white/10 p-4"
-                    >
-                      <b className="text-3xl">
-                        {n}
-                      </b>
-
-                      <p className="text-xs text-slate-300">
-                        {l}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm">
-                  <p className="flex justify-between">
-                    <span className="text-slate-400">
-                      Next birthday
-                    </span>
-
-                    <b>
-                      {invalidBirth
-                        ? '—'
-                        : next.toLocaleDateString(
-                            undefined,
-                            {
-                              month: 'long',
-                              day: 'numeric',
-                              year: 'numeric'
-                            }
-                          )}
-                    </b>
-                  </p>
-
-                  <p className="flex justify-between">
-                    <span className="text-slate-400">
-                      Countdown
-                    </span>
-
-                    <b>
-                      {invalidBirth
-                        ? '—'
-                        : `${days} days`}
-                    </b>
-                  </p>
-                </div>
-              </section>
-            </div>
-
-            <div className="mt-5 grid gap-5 lg:grid-cols-2">
-              <Card>
-                <div className="flex items-center gap-2">
-                  <Target className="text-emerald-600"/>
-
-                  <h3 className="font-black">
-                    Life milestones
-                  </h3>
-                </div>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Your journey in memorable numbers.
-                </p>
-
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <Stat
-                    n={livedDays}
-                    l="Days lived"
-                  />
-
-                  <Stat
-                    n={age.years * 12 + age.months}
-                    l="Months lived"
-                  />
-
-                  <Stat
-                    n={age.years}
-                    l="Years celebrated"
-                  />
-
-                  <Stat
-                    n={Math.floor(
-                      Math.max(
-                        0,
-                        current.getTime() -
-                        birth.getTime()
-                      ) / 3600000
-                    )}
-                    l="Hours lived"
-                  />
-                </div>
-
-                <div className="mt-4 space-y-2 text-sm">
-                  {milestones.map(m =>
-                    <div
-                      key={m.days}
-                      className="rounded-xl bg-emerald-50 p-3 dark:bg-emerald-950/30"
-                    >
-                      🎯 {m.left.toLocaleString()} days until your {m.days.toLocaleString()}-day milestone
-                    </div>
-                  )}
-                </div>
-              </Card>
-
-              <Card>
-                <div className="flex items-center gap-2">
-                  <Gem className="text-emerald-600"/>
-
-                  <h3 className="font-black">
-                    Zodiac & birthday facts
-                  </h3>
-                </div>
-
-                <div className="mt-4 rounded-2xl bg-gradient-to-br from-violet-50 to-emerald-50 p-5 dark:from-violet-950/30 dark:to-emerald-950/30">
-                  <b className="text-2xl">
-                    {zodiac}
-                  </b>
-
-                  <p className="mt-2">
-                    📅 {facts[0]}
-                  </p>
-
-                  <p>
-                    💎 Birthstone: {facts[1]}
-                  </p>
-
-                  <p>
-                    🎨 Lucky color: {facts[2]}
-                  </p>
-                </div>
-              </Card>
-            </div>
-
-            <Card className="mt-5">
-              <div className="flex items-center gap-2">
-                <Bell className="text-emerald-600"/>
-
-                <h3 className="font-black">
-                  Birthday reminders & countdown
-                </h3>
-              </div>
-
-              <p className="mt-1 text-sm text-slate-500">
-                Save birthdays on this device and schedule native Android reminders.
-              </p>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-                <input
-                  placeholder="Person's name"
-                  value={person}
-                  onChange={e =>
-                    setPerson(e.target.value)
-                  }
-                  className="input"
-                />
-
-                <BirthdayDatePicker
-                  value={personDate}
-                  onChange={setPersonDate}
-                />
-
-                <button
-                  onClick={addBirthday}
-                  disabled={
-                    !person.trim() ||
-                    !personDate
-                  }
-                  className="rounded-xl bg-emerald-600 px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Plus
-                    className="inline"
-                    size={17}
-                  />
-                  {' '}Add
-                </button>
-              </div>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {sortedBirthdays.length === 0
-                  ? <p className="text-sm text-slate-500">
-                      No birthdays saved yet.
-                    </p>
-                  : sortedBirthdays.map(x =>
-                      <div
-                        key={x.id}
-                        className="flex items-center justify-between rounded-2xl bg-slate-50 p-4 dark:bg-slate-800"
-                      >
-                        <div>
-                          <b>
-                            🎂 {x.name}
-                          </b>
-
-                          <p className="text-sm text-slate-500">
-                            {daysUntil(x.date)} days to go
-                          </p>
-                        </div>
-
-                        <button
-                          aria-label={`Delete ${x.name}'s birthday`}
-                          onClick={() =>
-                            void deleteBirthday(x.id)
-                          }
-                        >
-                          <Trash2 size={18}/>
-                        </button>
-                      </div>
-                    )}
-              </div>
-            </Card>
-          </>
-        )}
-
-        {tab === 'wishes' && (
-          <Content title="Wishes & blessings">
-            <Tabs
-              values={[
-                'birthday',
-                'month',
-                'year'
-              ]}
-              active={wishType}
-              set={(v: 'birthday'|'month'|'year') => {
-                setWishType(v);
-                setWishIndex(0);
-              }}
-            />
-
-            <TextBox text={activeText}/>
-
-            <Actions
-              copy={copy}
-              share={share}
-              copied={copied}
-              favorite={toggleFavorite}
-              isFavorite={isFavorite}
-            />
-
-            <p className="mt-3 text-center text-xs font-semibold text-slate-500">
-              {wishIndex + 1} of {wishes[wishType].length}
-            </p>
-
-            <button
-              onClick={() =>
-                setWishIndex(
-                  i =>
-                    (i + 1) %
-                    wishes[wishType].length
-                )
-              }
-              className="primary"
-            >
-              Show another
-            </button>
-          </Content>
-        )}
-
-        {tab === 'prayers' && (
-          <Content title="Daily prayer section">
-            <Tabs
-              values={[
-                'morning',
-                'evening',
-                'success'
-              ]}
-              active={prayerType}
-              set={(v: 'morning'|'evening'|'success') => {
-                setPrayerType(v);
-                setPrayerIndex(0);
-              }}
-            />
-
-            <TextBox text={activeText}/>
-
-            <Actions
-              copy={copy}
-              share={share}
-              copied={copied}
-              favorite={toggleFavorite}
-              isFavorite={isFavorite}
-            />
-
-            <button
-              onClick={() =>
-                setPrayerIndex(
-                  i =>
-                    (i + 1) %
-                    prayers[prayerType].length
-                )
-              }
-              className="primary"
-            >
-              Another prayer
-            </button>
-          </Content>
-        )}
-
-        {tab === 'motivation' && (
-          <Content title="Your daily motivation">
-            <TextBox text={activeText}/>
-
-            <Actions
-              copy={copy}
-              share={share}
-              copied={copied}
-              favorite={toggleFavorite}
-              isFavorite={isFavorite}
-            />
-
-            <button
-              onClick={() =>
-                setQuoteIndex(
-                  i =>
-                    (i + 1) %
-                    quotes.length
-                )
-              }
-              className="primary"
-            >
-              New motivation
-            </button>
-
-            <div className="mt-5 rounded-2xl bg-amber-50 p-5 dark:bg-amber-950/30">
-              🎯 <b>Today’s reminder</b>
-
-              <p className="mt-1">
-                Protect your peace, do one important thing well, and be grateful for your progress.
-              </p>
-            </div>
-          </Content>
-        )}
-
-        {tab === 'cards' && (
-          <Content title="Birthday card generator">
-            <p className="mb-4 text-sm text-slate-500">
-              Create a celebration card you can download as a PNG image and share.
-            </p>
-
-            <input
-              value={cardName}
-              onChange={e =>
-                setCardName(e.target.value)
-              }
-              placeholder="Recipient name"
-              className="input mb-3"
-            />
-
-            <textarea
-              value={cardMessage}
-              onChange={e =>
-                setCardMessage(e.target.value)
-              }
-              className="input min-h-28"
-            />
-
-            <div className="mt-5 rounded-3xl bg-gradient-to-br from-emerald-700 to-teal-500 p-8 text-center text-white">
-              <p className="text-sm tracking-widest">
-                AGEJOY CELEBRATION
-              </p>
-
-              <h3 className="mt-4 text-3xl font-black">
-                Happy Birthday, {cardName}! 🎂
-              </h3>
-
-              <p className="mx-auto mt-4 max-w-xl">
-                {cardMessage}
-              </p>
-
-              <p className="mt-6 text-sm text-emerald-100">
-                Made with AgeJoy ✨
-              </p>
-            </div>
-
-            <button
-              onClick={downloadCard}
-              className="primary"
-            >
-              <Download
-                className="inline"
-                size={17}
-              />
-              {' '}Download PNG card
-            </button>
-          </Content>
-        )}
-
-        {favorites.length > 0 && (
-          <Card className="mt-6">
-            <div className="flex items-center gap-2">
-              <Heart className="text-emerald-600"/>
-
-              <h3 className="font-black">
-                Favorites
-              </h3>
-            </div>
-
-            <p className="mt-1 text-sm text-slate-500">
-              Your saved wishes, prayers and motivations stay on this device.
-            </p>
-
-            <div className="mt-4 space-y-3">
-              {favorites.map(f =>
-                <div
-                  key={f.id}
-                  className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-800"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="font-semibold">
-                      “{f.text}”
-                    </p>
-
-                    <button
-                      aria-label="Remove favorite"
-                      onClick={() =>
-                        setFavorites(
-                          v =>
-                            v.filter(
-                              x => x.id !== f.id
-                            )
-                        )
-                      }
-                    >
-                      <Trash2 size={17}/>
-                    </button>
-                  </div>
-
-                  <p className="mt-2 text-xs font-bold uppercase text-emerald-700">
-                    {f.category}
-                  </p>
-                </div>
-              )}
-            </div>
-          </Card>
-        )}
-
-        <Card className="mt-6">
-          <div className="flex items-center gap-2">
-            <BellRing className="text-emerald-600"/>
-
-            <div>
-              <h3 className="font-black">
-                Notifications
-              </h3>
-
-              <p className="text-sm text-slate-500">
-                Enable native Android birthday reminders. AgeJoy does not need contacts, phone, storage or overlay access.
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={requestNotifications}
-            className="primary"
-          >
-            {notify
-              ? 'Refresh birthday reminders'
-              : 'Enable notifications'}
-          </button>
-        </Card>
-
-        <footer className="py-10 text-center text-xs text-slate-400">
-          AgeJoy • Celebrate every day with purpose, gratitude and hope.
-          <br/>
-
-          <a
-            href="./privacy-policy.html"
-            className="mt-3 inline-block font-bold text-emerald-700 underline"
-          >
-            Privacy Policy
-          </a>
-
-          <span className="mx-2">
-            •
-          </span>
-
-          <span>
-            Current build: no advertising or analytics SDK
-          </span>
-        </footer>
-      </main>
-    </div>
-  );
-}
-
-function wrapCanvasText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  lineHeight: number
-) {
-  const words = text.split(/\s+/);
-  let line = '';
-
-  for (const word of words) {
-    const test =
-      line
-        ? `${line} ${word}`
-        : word;
-
-    if (
-      ctx.measureText(test).width >
-        maxWidth &&
-      line
-    ) {
-      ctx.fillText(
-        line,
-        x,
-        y
-      );
-
-      line = word;
-      y += lineHeight;
-    } else {
-      line = test;
-    }
-  }
-
-  if (line) {
-    ctx.fillText(
-      line,
-      x,
-      y
-    );
-  }
-}
-
-function BirthdayDatePicker({
-  value,
-  onChange
-}: {
-  value: string;
-  onChange: (value: string) => void
-}) {
-  const parse = () => {
-    const [y,m,d] =
-      value
-        ? value.split('-')
-        : ['','',''];
-
-    return {
-      y: y || '',
-      m: m
-        ? String(Number(m))
-        : '',
-      d: d
-        ? String(Number(d))
-        : ''
-    };
-  };
-
-  const [parts,setParts] =
-    useState(parse);
-
-  useEffect(() => {
-    setParts(parse());
-  }, [value]);
-
-  const currentYear =
-    new Date().getFullYear();
-
-  const years =
-    Array.from(
-      {
-        length:
-          currentYear -
-          1899 +
-          6
-      },
-      (_,i) =>
-        String(
-          currentYear +
-          5 -
-          i
-        )
-    );
-
-  const months = [
-    ['1','January'],
-    ['2','February'],
-    ['3','March'],
-    ['4','April'],
-    ['5','May'],
-    ['6','June'],
-    ['7','July'],
-    ['8','August'],
-    ['9','September'],
-    ['10','October'],
-    ['11','November'],
-    ['12','December']
-  ];
-
-  const days =
-    Array.from(
-      { length: 31 },
-      (_,i) =>
-        String(i + 1)
-    );
-
-  const update = (
-    key: 'y'|'m'|'d',
-    next: string
-  ) => {
-    const p = {
-      ...parts,
-      [key]: next
-    };
-
-    const year =
-      Number(
-        p.y ||
-        currentYear
-      );
-
-    const month =
-      Number(
-        p.m ||
-        1
-      );
-
-    if (
-      (key === 'm' ||
-       key === 'y') &&
-      p.d &&
-      Number(p.d) >
-        daysInMonth(
-          year,
-          month - 1
-        )
-    ) {
-      p.d =
-        String(
-          daysInMonth(
-            year,
-            month - 1
-          )
-        );
-    }
-
-    setParts(p);
-
-    if (
-      p.y &&
-      p.m &&
-      p.d
-    ) {
-      onChange(
-        `${p.y}-${String(p.m).padStart(2,'0')}-${String(p.d).padStart(2,'0')}`
-      );
-    } else {
-      onChange('');
-    }
-  };
-
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      <select
-        aria-label="Birthday month"
-        value={parts.m}
-        onChange={e =>
-          update(
-            'm',
-            e.target.value
-          )
-        }
-        className="input"
-      >
-        <option value="">
-          Month
-        </option>
-
-        {months.map(
-          ([n,label]) =>
-            <option
-              key={n}
-              value={n}
-            >
-              {label}
-            </option>
-        )}
-      </select>
-
-      <select
-        aria-label="Birthday day"
-        value={parts.d}
-        onChange={e =>
-          update(
-            'd',
-            e.target.value
-          )
-        }
-        className="input"
-      >
-        <option value="">
-          Day
-        </option>
-
-        {days.map(
-          n =>
-            <option
-              key={n}
-              value={n}
-            >
-              {n}
-            </option>
-        )}
-      </select>
-
-      <select
-        aria-label="Birthday year"
-        value={parts.y}
-        onChange={e =>
-          update(
-            'y',
-            e.target.value
-          )
-        }
-        className="input"
-      >
-        <option value="">
-          Year
-        </option>
-
-        {years.map(
-          y =>
-            <option
-              key={y}
-              value={y}
-            >
-              {y}
-            </option>
-        )}
-      </select>
-    </div>
-  );
-}
-
-function Card({
-  children,
-  className = ''
-}: {
-  children: React.ReactNode;
-  className?: string
-}) {
-  return (
-    <section
-      className={
-        'rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 ' +
-        className
-      }
-    >
-      {children}
-    </section>
-  );
-}
-
-function Content({
-  title,
-  children
-}: {
-  title: string;
-  children: React.ReactNode
-}) {
-  return (
-    <Card>
-      <h3 className="mb-5 text-2xl font-black">
-        {title}
-      </h3>
-
-      {children}
-    </Card>
-  );
-}
-
-function Label({
-  title,
-  children
-}: {
-  title: string;
-  children: React.ReactNode
-}) {
-  return (
-    <label className="text-sm font-bold">
-      {title}
-      {children}
-    </label>
-  );
-}
-
-function Tabs({
-  values,
-  active,
-  set
-}: {
-  values: string[];
-  active: string;
-  set: (v: any) => void
-}) {
-  return (
-    <div className="mb-5 flex flex-wrap gap-2">
-      {values.map(
-        v =>
-          <button
-            key={v}
-            onClick={() => set(v)}
-            className={
-              'rounded-full px-4 py-2 text-sm font-bold capitalize ' +
-              (
-                active === v
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
-              )
-            }
-          >
-            {
-              v === 'success'
-                ? 'Success'
-                : v === 'month'
-                  ? 'New Month'
-                  : v === 'year'
-                    ? 'New Year'
-                    : v
-            }
-          </button>
-      )}
-    </div>
-  );
-}
-
-function TextBox({
-  text
-}: {
-  text: string
-}) {
-  return (
-    <div className="rounded-3xl bg-emerald-50 p-7 dark:bg-emerald-950/30">
-      <p className="text-xl font-bold leading-relaxed">
-        “{text}”
-      </p>
-    </div>
-  );
-}
-
-function Actions({
-  copy,
-  share,
-  copied,
-  favorite,
-  isFavorite
-}: {
-  copy: () => void;
-  share: () => void;
-  copied: boolean;
-  favorite: () => void;
-  isFavorite: boolean
-}) {
-  return (
-    <div className="mt-4 grid grid-cols-3 gap-3">
-      <button
-        onClick={copy}
-        className="flex items-center justify-center gap-2 rounded-xl border py-3 font-bold dark:border-slate-700"
-      >
-        {copied
-          ? <Check size={17}/>
-          : <RotateCcw size={17}/>
-        }
-
-        {copied
-          ? 'Copied'
-          : 'Copy'}
-      </button>
-
-      <button
-        onClick={share}
-        className="flex items-center justify-center gap-2 rounded-xl border py-3 font-bold dark:border-slate-700"
-      >
-        <Share2 size={17}/>
-        Share
-      </button>
-
-      <button
-        onClick={favorite}
-        className="flex items-center justify-center gap-2 rounded-xl border py-3 font-bold dark:border-slate-700"
-      >
-        <Heart
-          size={17}
-          fill={
-            isFavorite
-              ? 'currentColor'
-              : 'none'
-          }
-        />
-
-        {isFavorite
-          ? 'Saved'
-          : 'Favorite'}
-      </button>
-    </div>
-  );
-}
-
-function Stat({
-  n,
-  l
-}: {
-  n: number;
-  l: string
-}) {
-  return (
-    <div className="rounded-2xl bg-slate-50 p-4 text-center dark:bg-slate-800">
-      <b className="text-xl">
-        {Number(n).toLocaleString()}
-      </b>
-
-      <p className="text-xs text-slate-500">
-        {l}
-      </p>
-    </div>
-  );
-}
+        awai
