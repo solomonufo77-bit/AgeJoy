@@ -632,8 +632,7 @@ export default function App() {
         /* notification cleanup is best effort */
       }
     }
-  };
-
+    
   const downloadCard = () => {
   const canvas = document.createElement('canvas');
 
