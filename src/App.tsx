@@ -635,6 +635,120 @@ export default function App() {
   };
 
   const downloadCard = () => {
+  const canvas = document.createElement('canvas');
+
+  canvas.width = 1080;
+  canvas.height = 1080;
+
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) return;
+
+  const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
+
+  gradient.addColorStop(0, '#087f5b');
+  gradient.addColorStop(1, '#14b8a6');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  ctx.globalAlpha = 0.25;
+  ctx.fillStyle = '#6ee7b7';
+
+  ctx.beginPath();
+  ctx.arc(900, 170, 210, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = '#d1fae5';
+  ctx.font = '700 38px Arial';
+
+  ctx.fillText(
+    'AGEJOY CELEBRATION',
+    90,
+    180
+  );
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '700 82px Arial';
+
+  ctx.fillText(
+    'Happy Birthday',
+    90,
+    390
+  );
+
+  ctx.fillStyle = '#d1fae5';
+  ctx.font = '700 64px Arial';
+
+  ctx.fillText(
+    cardName.slice(0, 24),
+    90,
+    510
+  );
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '36px Arial';
+
+  wrapCanvasText(
+    ctx,
+    cardMessage,
+    90,
+    610,
+    880,
+    52
+  );
+
+  ctx.fillStyle = '#d1fae5';
+  ctx.font = '700 32px Arial';
+
+  ctx.fillText(
+    'Made with AgeJoy',
+    90,
+    990
+  );
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) {
+      setNotice('Unable to create birthday card.');
+      return;
+    }
+
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            resolve(reader.result);
+          } else {
+            reject(new Error('Unable to read card'));
+          }
+        };
+
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+
+      const base64 = dataUrl.split(',')[1];
+
+      const fileName = `AgeJoy-Birthday-Card-${Date.now()}.png`;
+
+      await Filesystem.writeFile({
+        path: fileName,
+        data: base64,
+        directory: Directory.Documents,
+        recursive: true
+      });
+
+      setNotice('Birthday card saved to your Documents folder.');
+    } catch (error) {
+      console.error('Birthday card save error:', error);
+      setNotice('Could not save birthday card.');
+    }
+  }, 'image/png');
+};
     const canvas =
       document.createElement('canvas');
 
