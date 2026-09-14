@@ -1,0 +1,16 @@
+{
+  "name": "AgeJoy",
+  "short_name": "AgeJoy",
+  "description": "Age calculator, birthday reminders, wishes and daily inspiration.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#003A20",
+  "theme_color": "#00652F",
+  "icons": [
+    {
+      "src": "/agejoy-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
