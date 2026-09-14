@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Bell, BellRing, Cake, CalendarDays, Check, Moon, Quote, RotateCcw, Share2, Sparkles, Sun, Target, Cross, Gem, Star, Download, Plus, Trash2, Heart } from 'lucide-react';
 
