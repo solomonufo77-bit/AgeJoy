@@ -1,4 +1,3 @@
-
 import fs from 'node:fs';
 
 const variables = 'android/variables.gradle';
@@ -140,4 +139,4 @@ if (remaining.length > 0) {
 console.log(
   'AgeJoy configured for compileSdk 36 / targetSdk 36 with release signing.'
 );
-                                
+
