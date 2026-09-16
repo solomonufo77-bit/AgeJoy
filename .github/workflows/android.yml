@@ -75,7 +75,16 @@ jobs:
 
       - name: Build release AAB
         working-directory: android
-        run: ./gradlew bundleRelease
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_PASSWORD"
+          test -n "$KEY_ALIAS"
+          test -n "$KEY_PASSWORD"
+          test -s agejoy-upload-key.jks
+          ./gradlew bundleRelease --stacktrace
 
       - name: Verify unwanted permissions
         working-directory: android
