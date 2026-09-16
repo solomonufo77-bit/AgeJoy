@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.AgeJoy.app',
+  appId: 'com.AgeJoy.myapp',
   appName: 'AgeJoy',
   webDir: 'dist',
   bundledWebRuntime: false,
